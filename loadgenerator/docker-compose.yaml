@@ -1,0 +1,18 @@
+name: k6-test
+volumes:
+  grafana: 
+services:
+  # Grafana Alloy batches and processes traces sent to it, generating
+  # auto-logs from those traces.
+  # Includes Metrics, Logs, Traces and Profiles.  
+  k6:
+    image: grafana/k6
+    volumes:
+      - "./k6:/scripts"
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://mimir:9009/api/v1/push
+      - K6_DURATION=3600s
+      - K6_VUS=4
+      - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
+    restart: always
+    command: ["run", "-o", "experimental-prometheus-rw", "/k6-loadtest.js"]
